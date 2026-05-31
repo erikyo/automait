@@ -10,11 +10,12 @@
  *   -m, --model <name>         Ollama model (default: gemma4)
  *   -p, --system-prompt <str>  Override the system prompt
  *   -d, --dry-run              Plan only — do not execute any git commands
+ *   --commit <count>           Preferred total number of commits
  *   -v, --version              Print version and exit
  *   -h, --help                 Show help
  */
 
-import { program } from 'commander';
+import { InvalidArgumentError, program } from 'commander';
 import { createRequire } from 'module';
 import { resolve } from 'path';
 
@@ -28,6 +29,14 @@ import { printError, printWarning, c } from './ui.js';
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
 
+function parseCommitCount(value) {
+  const count = Number(value);
+  if (!Number.isInteger(count) || count < 1) {
+    throw new InvalidArgumentError('must be a positive integer');
+  }
+  return count;
+}
+
 // ─── CLI definition ───────────────────────────────────────────────────────────
 
 program
@@ -38,6 +47,8 @@ program
   .option('-m, --model <name>',           'Ollama model identifier')
   .option('-p, --system-prompt <string>', 'Override the system prompt for commit generation')
   .option('-d, --dry-run',                'Analyse and plan only — do not run any git commands', false)
+  .option('--commit <count>',             'Preferred total number of commits', parseCommitCount)
+  .option('--commits <count>',            'Alias for --commit', parseCommitCount)
   .option('--cwd <path>',                 'Run as if automait were started in this directory')
   .addHelpText(
     'after',
@@ -50,6 +61,7 @@ ${c.bold('Configuration')}
 
 ${c.bold('Examples')}
   ${c.muted('$')} automait
+  ${c.muted('$')} automait --commit 6
   ${c.muted('$')} automait --model llama3 --dry-run
   ${c.muted('$')} AUTOMIT_MODEL=mistral automait
 `
@@ -89,7 +101,11 @@ async function main() {
   );
 
   try {
-    await runWorkflow(config, { dryRun: flags.dryRun, cwd });
+    await runWorkflow(config, {
+      dryRun: flags.dryRun,
+      cwd,
+      targetCommitCount: flags.commit ?? flags.commits,
+    });
   } catch (err) {
     if (err instanceof UserError) {
       // Expected user-facing errors (no staged files, etc.)

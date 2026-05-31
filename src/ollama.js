@@ -29,6 +29,19 @@ function basename(filePath) {
   return normalized.split('/').pop() || normalized;
 }
 
+function clampCommitTarget(target, fileCount) {
+  if (!Number.isInteger(target) || target < 1 || fileCount < 1) return null;
+  return Math.min(target, fileCount);
+}
+
+function commitMessageForFile(file, fallbackMessage) {
+  const shortName = basename(file).replace(/\.[^.]+$/, '');
+  const subject = `update ${shortName}`.slice(0, 46).trim();
+  const prefixMatch = fallbackMessage.match(/^([a-z]+(?:\([^)]+\))?):/);
+  const prefix = prefixMatch?.[1] || 'chore(staged)';
+  return `${prefix}: ${subject}`;
+}
+
 function getAutoDescription(file) {
   const metadata = AUTO_DESCRIBED_FILES.get(basename(file.path));
   if (!metadata) return null;
@@ -261,7 +274,40 @@ function normalizeObservationResult(parsed) {
   };
 }
 
-function normalizeCommitPlan(parsed, fallbackSummary, allowedFiles) {
+function adjustCommitCount(commits, targetCount) {
+  const totalFiles = commits.reduce((sum, commit) => sum + commit.files.length, 0);
+  const target = clampCommitTarget(targetCount, totalFiles);
+  if (!target) return commits;
+
+  const adjusted = commits.map((commit) => ({ ...commit, files: [...commit.files] }));
+
+  while (adjusted.length < target) {
+    const index = adjusted.findIndex((commit) => commit.files.length > 1);
+    if (index === -1) break;
+
+    const source = adjusted[index];
+    const file = source.files.pop();
+    adjusted.splice(index + 1, 0, {
+      ...source,
+      files: [file],
+      message: commitMessageForFile(file, source.message),
+      rationale: `Split from a larger group to match the requested commit count.`,
+    });
+  }
+
+  while (adjusted.length > target && adjusted.length > 1) {
+    const last = adjusted.pop();
+    const previous = adjusted[adjusted.length - 1];
+    previous.files.push(...last.files);
+    previous.rationale = [previous.rationale, last.rationale]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  return adjusted;
+}
+
+function normalizeCommitPlan(parsed, fallbackSummary, allowedFiles, targetCommitCount) {
   const allowed = new Set(allowedFiles);
   const used = new Set();
 
@@ -316,9 +362,11 @@ function normalizeCommitPlan(parsed, fallbackSummary, allowedFiles) {
     });
   }
 
+  const adjustedCommits = adjustCommitCount(commits, targetCommitCount);
+
   return {
     summary: parsed.summary || parsed.Summary || parsed.description || fallbackSummary,
-    commits: commits.map((commit, index) => ({ ...commit, id: index + 1 })),
+    commits: adjustedCommits.map((commit, index) => ({ ...commit, id: index + 1 })),
   };
 }
 
@@ -398,10 +446,25 @@ function mergeGitignoreSuggestions(...groups) {
   return [...byPattern.values()];
 }
 
-function buildFallbackPlan(memory) {
+function buildFallbackPlan(memory, targetCommitCount) {
   const files = memory.analyzed_files;
   const scopes = [...new Set(memory.themes.filter(Boolean))];
   const scope = scopes[0] || 'staged';
+  const target = clampCommitTarget(targetCommitCount, files.length);
+
+  if (target && target > 1) {
+    const commits = files.map((file, index) => ({
+      id: index + 1,
+      message: `chore(${scope}): update ${basename(file).replace(/\.[^.]+$/, '')}`.slice(0, 60),
+      files: [file],
+      rationale: 'Split by file to match the requested commit count.',
+    }));
+
+    return {
+      summary: memory.knowledge[0] || 'Automated commit grouping based on staged files.',
+      commits: adjustCommitCount(commits, target),
+    };
+  }
 
   return {
     summary: memory.knowledge[0] || 'Automated commit grouping based on staged files.',
@@ -558,7 +621,12 @@ Rules:
   }
 }
 
-async function finalizeCommitPlan(baseUrl, model, memory, timeoutMs) {
+async function finalizeCommitPlan(baseUrl, model, memory, timeoutMs, targetCommitCount) {
+  const target = clampCommitTarget(targetCommitCount, memory.analyzed_files.length);
+  const targetRule = target
+    ? `produce exactly ${target} commit${target === 1 ? '' : 's'} unless doing so would require an empty commit`
+    : 'choose the number of commits that best matches logical change boundaries';
+
   const messages = [
     { role: 'system', content: FINALIZER_SYSTEM },
     {
@@ -579,6 +647,7 @@ Produce commit groups.
 Rules:
 - use ONLY allowed files
 - every allowed file should appear in exactly one commit
+- ${targetRule}
 - conventional commits only
 - allowed types: feat, fix, chore, docs, refactor, test, build
 - subject <= 60 chars, lower-case, imperative mood
@@ -603,7 +672,8 @@ Rules:
   return normalizeCommitPlan(
     parseJsonResponse(content, 'final commit plan'),
     'Automated commit grouping based on staged files.',
-    memory.analyzed_files
+    memory.analyzed_files,
+    target
   );
 }
 
@@ -903,7 +973,7 @@ Rules:
  * @param {string} model
  * @param {string} diff
  * @param {number} timeoutMs
- * @param {{ fileIndex?: Array<{ path: string, additions: number|null, deletions: number|null, extension: string, status?: string }>, getDiffForFiles?: (files: string[]) => Promise<string|null>, projectMemory?: string }} [options]
+ * @param {{ fileIndex?: Array<{ path: string, additions: number|null, deletions: number|null, extension: string, status?: string }>, getDiffForFiles?: (files: string[]) => Promise<string|null>, projectMemory?: string, targetCommitCount?: number }} [options]
  * @returns {Promise<CommitPlan>}
  */
 export async function generateCommitPlan(baseUrl, model, diff, timeoutMs, options = {}) {
@@ -922,6 +992,10 @@ export async function generateCommitPlan(baseUrl, model, diff, timeoutMs, option
 
   const { analyzed: fileIndex, autoDescribed } = partitionAutoDescribedFiles(allFiles);
   const autoCommits = buildAutoDescribedCommits(autoDescribed);
+  const totalTargetCommitCount = clampCommitTarget(options.targetCommitCount, allFiles.length);
+  const analyzedTargetCommitCount = totalTargetCommitCount
+    ? clampCommitTarget(totalTargetCommitCount - autoCommits.length, fileIndex.length)
+    : null;
 
   const memory = {
     analyzed_files: [],
@@ -998,9 +1072,15 @@ export async function generateCommitPlan(baseUrl, model, diff, timeoutMs, option
 
   let plan;
   try {
-    plan = await finalizeCommitPlan(baseUrl, model, memory, timeoutMs);
+    plan = await finalizeCommitPlan(
+      baseUrl,
+      model,
+      memory,
+      timeoutMs,
+      analyzedTargetCommitCount
+    );
   } catch {
-    plan = buildFallbackPlan(memory);
+    plan = buildFallbackPlan(memory, analyzedTargetCommitCount);
   }
 
   try {

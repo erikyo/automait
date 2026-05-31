@@ -165,10 +165,10 @@ async function runPostCommitFollowUps(config, cwd, plan, projectMemory) {
  * Runs the complete automait workflow.
  *
  * @param {import('./config.js').Config} config
- * @param {{ dryRun?: boolean, cwd?: string }} [opts]
+ * @param {{ dryRun?: boolean, cwd?: string, targetCommitCount?: number }} [opts]
  */
 export async function runWorkflow(config, opts = {}) {
-  const { dryRun = false, cwd = process.cwd() } = opts;
+  const { dryRun = false, cwd = process.cwd(), targetCommitCount } = opts;
 
   // ── Step 1: Staging Detection ─────────────────────────────────────────────
 
@@ -323,6 +323,7 @@ export async function runWorkflow(config, opts = {}) {
         fileIndex: diffIndex,
         getDiffForFiles: (files) => getStagedDiffForFiles(files, cwd),
         projectMemory,
+        targetCommitCount,
       }
     );
     spin.succeed(`Plan ready — ${plan.commits.length} proposed commit(s)`);
