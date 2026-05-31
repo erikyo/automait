@@ -23,7 +23,6 @@ import {
   unstageFiles,
   stageFiles,
   createCommit,
-  filterStagedFiles,
 } from './git.js';
 
 import {
@@ -186,20 +185,27 @@ export async function runWorkflow(config, opts = {}) {
       console.log(`     ${c.muted('•')} ${c.accent(f)}`);
     }
 
-    const addUnstaged = await select({
-      message: 'Add these files before planning?',
-      choices: [
-        { name: 'Yes - stage them now', value: 'yes' },
-        { name: 'No - plan only currently staged changes', value: 'no' },
-      ],
+    const includeUnstaged = await select({
+      message: stagedFiles.length
+        ? 'Which files should automait plan commits for?'
+        : 'No files are staged yet. What should automait do?',
+      choices: stagedFiles.length
+        ? [
+            { name: 'Only files I already staged', value: false },
+            { name: 'All modified and untracked files', value: true },
+          ]
+        : [
+            { name: 'All modified and untracked files', value: true },
+            { name: 'Abort so I can stage files myself', value: false },
+          ],
     });
 
-    if (addUnstaged === 'yes') {
+    if (includeUnstaged) {
       if (dryRun) {
         printWarning('Dry-run mode enabled - unstaged files were not added.');
       } else {
         await stageFiles(unstagedFiles, cwd);
-        console.log(c.success(`  ✔ Added ${unstagedFiles.length} file(s) to staging`));
+        console.log(c.success(`  ✔ Included ${unstagedFiles.length} unstaged file(s) in the plan`));
 
         diff = await getStagedDiff(cwd);
         stagedFiles = await getStagedFiles(cwd);
@@ -298,6 +304,7 @@ export async function runWorkflow(config, opts = {}) {
 
   // Keep a snapshot of staged files so we can restore them if needed
   const originalStagedFiles = [...stagedFiles];
+  const originalStagedFileSet = new Set(originalStagedFiles);
 
   // ── Step 2: AI Planning ───────────────────────────────────────────────────
 
@@ -376,12 +383,16 @@ export async function runWorkflow(config, opts = {}) {
   const committedFiles = new Set();
 
   for (const commit of plan.commits) {
-    // Resolve which of this commit's proposed files are actually staged
-    const eligibleFiles = await filterStagedFiles(commit.files, cwd);
+    // Resolve against the original staged snapshot. Each successful commit
+    // clears the live index, so the live staged set is not the right source
+    // of truth for later commits in the same plan.
+    const eligibleFiles = [
+      ...new Set(commit.files),
+    ].filter((f) => originalStagedFileSet.has(f) && !committedFiles.has(f));
 
     if (eligibleFiles.length === 0) {
       printWarning(
-        `Commit #${commit.id} has no staged files matching its file list — skipping.`
+        `Commit #${commit.id} has no remaining files from the original staged set — skipping.`
       );
       skipped++;
       continue;
