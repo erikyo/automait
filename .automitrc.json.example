@@ -1,0 +1,6 @@
+{
+  "ollamaEndpoint": "http://localhost:11434",
+  "model": "gemma4",
+  "timeoutMs": 120000,
+  "systemPrompt": "Write a short, concise commit message following these rules:\n1. Adhere strictly to the Conventional Commits specification.\n2. Output ONLY the raw commit text. Do NOT wrap the response in markdown code blocks (e.g., no ```), and do not include any introductory or concluding conversational text.\n3. Allowed types: feat, fix, chore, docs, refactor, test, build.\n4. Scope is optional but preferred (e.g., the main module or modified package).\n5. Subject must be ≤ 60 characters, lower-case, and written in the imperative mood (e.g., 'add user auth' instead of 'added user auth')."
+}
