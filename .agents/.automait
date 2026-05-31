@@ -1,0 +1,12 @@
+# Project Architecture Reference: Automit CLI
+This document details the core structure of the Automit tool.
+**Project Folders:**
+*   `src/`: Contains all primary logic modules.
+*   `.agents/`: Stores project state and context files.
+**Core Modules (`src/`):**
+1.  `cli.js`: CLI entry point and argument handling.
+2.  `config.js`: Manages system configuration (ENV > File > Default).
+3.  `workflow.js`: Orchestrates the commit planning lifecycle.
+4.  `git.js`: Encapsulates all standard Git interactions (diff, status).
+5.  `ollama.js`: Handles interaction with external LLM APIs.
+6.  `memory.js`: Manages persistent project context state (`.automait`).
