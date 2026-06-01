@@ -56,14 +56,14 @@ program
 ${c.bold('Configuration')}
   automait reads config from (lowest → highest priority):
     1. ${c.muted('.automaitrc.json')} in the project root
-    2. Environment variables: ${c.muted('AUTOMIT_ENDPOINT')}, ${c.muted('AUTOMIT_MODEL')}, ${c.muted('AUTOMIT_SYSTEM_PROMPT')}
+    2. Environment variables: ${c.muted('AUTOMAIT_ENDPOINT')}, ${c.muted('AUTOMAIT_MODEL')}, ${c.muted('AUTOMAIT_SYSTEM_PROMPT')}
     3. CLI flags (above)
 
 ${c.bold('Examples')}
   ${c.muted('$')} automait
   ${c.muted('$')} automait --commit 6
   ${c.muted('$')} automait --model llama3 --dry-run
-  ${c.muted('$')} AUTOMIT_MODEL=mistral automait
+  ${c.muted('$')} AUTOMAIT_MODEL=mistral automait
 `
   );
 
