@@ -1,8 +1,8 @@
-# automait 🤖
+# Automit 🤖
 
 > AI-powered Git commit workflow automation using a local [Ollama](https://ollama.com) model.
 
-`automait` analyzes your staged changes, proposes a semantically grouped commit plan that follows the [Conventional Commits](https://www.conventionalcommits.org/) specification, and walks you through applying each commit interactively — all without sending your code to the cloud.
+`automit` analyzes your staged changes, proposes a semantically grouped commit plan that follows the [Conventional Commits](https://www.conventionalcommits.org/) specification, and walks you through applying each commit interactively — all without sending your code to the cloud.
 
 ---
 
@@ -10,9 +10,9 @@
 
 - **Zero cloud dependency** — runs entirely on your machine via Ollama.
 - **Smart grouping** — the AI proposes logically related file groups as separate commits.
-- **Controlled Commit Count** — Specify a desired total number of commits (`--commit`), and automait will intelligently adjust the proposed plan to meet that target.
+- **Controlled Commit Count** — Specify a desired total number of commits (`--commit`), and automit will intelligently adjust the proposed plan to meet that target.
 - **Interactive workflow** — apply, edit, or skip each commit one by one.
-- **Fully configurable** — CLI flags, environment variables, or a `.automaitrc.json` file.
+- **Fully configurable** — CLI flags, environment variables, or a `.automitrc.json` file.
 - **Safe restore** — skipped files are always re-staged exactly as they were.
 - **Post-commit follow-ups** — optionally update README, update CHANGELOG, or generate a PR message after commits.
 - **Beautiful output** — spinners, colours, and boxed summaries.
@@ -51,18 +51,18 @@ ollama serve
 ### Global install (recommended)
 
 ```bash
-npm install -g automait
+npm install -g automit
 ```
 
-After installation the `automait` binary is available system-wide.
+After installation the `automit` binary is available system-wide.
 
 ### Local development
 
 ```bash
-git clone https://github.com/your-org/automait.git
-cd automait
+git clone https://github.com/your-org/automit.git
+cd automit
 npm install
-npm link          # makes `automait` available globally from this checkout
+npm link          # makes `automit` available globally from this checkout
 ```
 
 ---
@@ -73,11 +73,11 @@ npm link          # makes `automait` available globally from this checkout
 # Stage some files
 git add src/auth.js src/middleware.js
 
-# Run automait
-automait
+# Run automit
+automit
 ```
 
-That's it. automait will:
+That's it. automit will:
 
 1. Detect the staged diff.
 2. Ask Ollama to analyse it and propose a commit plan.
@@ -90,7 +90,7 @@ That's it. automait will:
 ## Usage
 
 ```
-automait [options]
+automit [options]
 
 Options:
   -e, --endpoint <url>        Ollama base URL (default: http://localhost:11434)
@@ -98,7 +98,7 @@ Options:
   -p, --system-prompt <str>   Override the system prompt for commit generation
   -d, --dry-run               Analyse and plan only — do not execute any git commands
       --commit <count>        Enforce a preferred total number of commits (Alias: --commits)
-      --cwd <path>            Run as if automait were started in this directory
+      --cwd <path>            Run as if automit were started in this directory
   -v, --version               Print version and exit
   -h, --help                  Show help
 ```
@@ -107,11 +107,11 @@ Options:
 
 ```bash
 # Use a different model
-automait --model llama3
+automit --model llama3
 
 # Dry run (plan only, no commits)
-automait --dry-run
+automit --dry-run
 
 # Ask for exactly six total commits
-automait --commit 6
+automit --commit 6
 ```
