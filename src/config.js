@@ -2,7 +2,7 @@
  * config.js
  * Loads and merges configuration from multiple sources:
  *   1. .automaitrc.json (or any cosmiconfig-compatible format) in the project root
- *   2. Environment variables (AUTOMIT_*)
+ *   2. Environment variables (AUTOMAIT_*)
  *   3. CLI flags (highest priority, applied in cli.js)
  */
 
@@ -54,10 +54,10 @@ async function loadFileConfig() {
 
 function loadEnvConfig() {
   const env = {};
-  if (process.env.AUTOMIT_ENDPOINT) env.ollamaEndpoint = process.env.AUTOMIT_ENDPOINT;
-  if (process.env.AUTOMIT_MODEL) env.model = process.env.AUTOMIT_MODEL;
-  if (process.env.AUTOMIT_SYSTEM_PROMPT) env.systemPrompt = process.env.AUTOMIT_SYSTEM_PROMPT;
-  if (process.env.AUTOMIT_TIMEOUT_MS) env.timeoutMs = Number(process.env.AUTOMIT_TIMEOUT_MS);
+  if (process.env.AUTOMAIT_ENDPOINT) env.ollamaEndpoint = process.env.AUTOMAIT_ENDPOINT;
+  if (process.env.AUTOMAIT_MODEL) env.model = process.env.AUTOMAIT_MODEL;
+  if (process.env.AUTOMAIT_SYSTEM_PROMPT) env.systemPrompt = process.env.AUTOMAIT_SYSTEM_PROMPT;
+  if (process.env.AUTOMAIT_TIMEOUT_MS) env.timeoutMs = Number(process.env.AUTOMAIT_TIMEOUT_MS);
   return env;
 }
 
