@@ -1,6 +1,6 @@
 /**
  * workflow.js
- * Orchestrates the full 6-step automait workflow:
+ * Orchestrates the full 6-step automit workflow:
  *   1. Staging detection
  *   2. AI planning
  *   3. Plan presentation
@@ -166,7 +166,7 @@ async function runPostCommitFollowUps(config, cwd, plan, projectMemory) {
 // ─── Main workflow entry point ────────────────────────────────────────────────
 
 /**
- * Runs the complete automait workflow.
+ * Runs the complete automit workflow.
  *
  * @param {import('./config.js').Config} config
  * @param {{ dryRun?: boolean, cwd?: string, targetCommitCount?: number }} [opts]
@@ -191,8 +191,8 @@ export async function runWorkflow(config, opts = {}) {
 
 		const includeUnstaged = await select({
 			message: stagedFiles.length
-				? "Which files should automait plan commits for?"
-				: "No files are staged yet. What should automait do?",
+				? "Which files should automit plan commits for?"
+				: "No files are staged yet. What should automit do?",
 			choices: stagedFiles.length
 				? [
 						{ name: "Only files I already staged", value: false },
@@ -225,9 +225,9 @@ export async function runWorkflow(config, opts = {}) {
 	if (!diff) {
 		throw new UserError(
 			"No staged changes detected.\n" +
-				"  Stage the changes you want automait to plan, then run it again:\n" +
+				"  Stage the changes you want automit to plan, then run it again:\n" +
 				"    git add <files>\n" +
-				"    automait",
+				"    automit",
 		);
 	}
 
@@ -273,7 +273,7 @@ export async function runWorkflow(config, opts = {}) {
 			...new Set(ignoreSuggestions.flatMap((item) => item.matched_files)),
 		];
 		const addToGitignore = await select({
-			message: "How should automait handle these likely ignored files?",
+			message: "How should automit handle these likely ignored files?",
 			choices: [
 				{
 					name: "Update .gitignore and unstage matched files",
