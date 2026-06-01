@@ -1,7 +1,7 @@
 /**
  * git.js
  * Thin, promise-based wrappers around simple-git for the operations
- * automait needs: diff, stage, reset, commit, and status helpers.
+ * automit needs: diff, stage, reset, commit, and status helpers.
  */
 
 import { simpleGit } from "simple-git";

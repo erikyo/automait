@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * cli.js  —  automait entry point
+ * cli.js  —  automit entry point
  *
  * Usage:
- *   automait [options]
+ *   automit [options]
  *
  * Options:
  *   -e, --endpoint <url>       Ollama base URL (default: http://localhost:11434)
@@ -41,7 +41,7 @@ function parseCommitCount(value) {
 // ─── CLI definition ───────────────────────────────────────────────────────────
 
 program
-	.name("automait")
+	.name("automit")
 	.description("AI-powered Git commit workflow using a local Ollama model")
 	.version(pkg.version, "-v, --version")
 	.option("-e, --endpoint <url>", "Ollama base URL")
@@ -61,21 +61,21 @@ program
 		parseCommitCount,
 	)
 	.option("--commits <count>", "Alias for --commit", parseCommitCount)
-	.option("--cwd <path>", "Run as if automait were started in this directory")
+	.option("--cwd <path>", "Run as if automit were started in this directory")
 	.addHelpText(
 		"after",
 		`
 ${c.bold("Configuration")}
-  automait reads config from (lowest → highest priority):
-    1. ${c.muted(".automaitrc.json")} in the project root
-    2. Environment variables: ${c.muted("AUTOMAIT_ENDPOINT")}, ${c.muted("AUTOMAIT_MODEL")}, ${c.muted("AUTOMAIT_SYSTEM_PROMPT")}
+  automit reads config from (lowest → highest priority):
+    1. ${c.muted(".automitrc.json")} in the project root
+    2. Environment variables: ${c.muted("AUTOMIT_ENDPOINT")}, ${c.muted("AUTOMIT_MODEL")}, ${c.muted("AUTOMIT_SYSTEM_PROMPT")}
     3. CLI flags (above)
 
 ${c.bold("Examples")}
-  ${c.muted("$")} automait
-  ${c.muted("$")} automait --commit 6
-  ${c.muted("$")} automait --model llama3 --dry-run
-  ${c.muted("$")} AUTOMAIT_MODEL=mistral automait
+  ${c.muted("$")} automit
+  ${c.muted("$")} automit --commit 6
+  ${c.muted("$")} automit --model llama3 --dry-run
+  ${c.muted("$")} AUTOMIT_MODEL=mistral automit
 `,
 	);
 
@@ -92,10 +92,10 @@ async function main() {
 	if (!(await isGitRepo(cwd))) {
 		printError(
 			`${cwd} is not inside a Git repository.\n` +
-				"  Create one first, then stage the changes you want automait to plan:\n" +
+				"  Create one first, then stage the changes you want automit to plan:\n" +
 				"    git init\n" +
 				"    git add <files>\n" +
-				"    automait",
+				"    automit",
 		);
 		process.exit(1);
 	}
