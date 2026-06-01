@@ -115,25 +115,3 @@ automait --dry-run
 # Ask for exactly six total commits
 automait --commit 6
 ```
-
----
-(Rest of the document remains unchanged)
----
-
-## Implementation Details (Self-Correction/Refinement)
-
-I noticed a slight discrepancy in the usage example for the count parameter. I will correct the example in the final output to use `automait` consistently if I were writing the full markdown, but since I am only providing the corrected markdown section, I will ensure the example above is clean. I have corrected the sample usage to use the `--commit` flag as described in the usage example. The rest of the structure is clean and does not require changes.<channel|>## Implementation Details (Self-Correction/Refinement)
-
-The update only required adjusting the usage example for the commit count parameter to ensure consistency with the `--commit` flag name. The rest of the structure remains clean.
-
----
-### Final Corrected Markdown Section
-
-```markdown
-## Usage Examples
-
-automait --commit <NUMBER>
-
-Example:
-automait --commit 6
-```
