@@ -1,12 +1,12 @@
-## Project Architecture Context (Automait)
-**Structure:**
-The project is modular, utilizing `src/` for core logic and `.agents/` for persistent state and context.
-**Folders & Roles:**
-*   `src/`: Contains all core application logic and utilities.
-*   `.agents/`: Stores run-time context, history, and internal state management data.
-**Key Modules:**
-*   `src/cli.js`: CLI entry point. Handles user input and command execution.
-*   `src/config.js`: Manages configuration loading (Environment variables > File > Default).
-*   `src/git.js`: Abstracts all version control system (VCS) interactions.
-*   `src/ollama.js`: Handles structured planning and LLM communication.
-*   `src/workflow.js`: Orchestrates the multi-step planning and execution lifecycle.
+# Project Context Summary (Automait)
+**1. Core Source Logic (`src/`)**
+-   Houses all application modules: `cli`, `workflow`, `git`, `ollama`, etc.
+-   Contains reusable utilities (`utils/`) and configuration handling.
+-   This is the primary area for feature development.
+**2. Compiled Output (`lib/`)**
+-   Contains the built, deployable JavaScript code (output of `tsdown`).
+-   Should remain stable after successful build commits.
+-   *Crucial: This directory is ignored by Git.*
+**3. Agent Runtime State (`.agents/`)**
+-   Stores session history, transient context, and persistent user profiles.
+-   Should not contain application logic; only generated state data.

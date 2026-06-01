@@ -4,7 +4,7 @@
  * automait needs: diff, stage, reset, commit, and status helpers.
  */
 
-import { simpleGit } from 'simple-git';
+import { simpleGit } from "simple-git";
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
 
@@ -13,27 +13,27 @@ import { simpleGit } from 'simple-git';
  * @param {string} [cwd=process.cwd()]
  */
 function git(cwd = process.cwd()) {
-  return simpleGit({ baseDir: cwd, binary: 'git', trimmed: true });
+	return simpleGit({ baseDir: cwd, binary: "git", trimmed: true });
 }
 
 async function hasHead(cwd) {
-  try {
-    await git(cwd).revparse(['--verify', 'HEAD']);
-    return true;
-  } catch {
-    return false;
-  }
+	try {
+		await git(cwd).revparse(["--verify", "HEAD"]);
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 async function unstageAddedFiles(files, cwd) {
-  if (!files.length) return;
-  const g = git(cwd);
-  await g.raw(['rm', '--cached', '-r', '-f', '--', ...files]);
+	if (!files.length) return;
+	const g = git(cwd);
+	await g.raw(["rm", "--cached", "-r", "-f", "--", ...files]);
 }
 
 async function clearIndex(cwd) {
-  const g = git(cwd);
-  await g.raw(['read-tree', '--empty']);
+	const g = git(cwd);
+	await g.raw(["read-tree", "--empty"]);
 }
 
 // ─── Diff ─────────────────────────────────────────────────────────────────────
@@ -46,9 +46,9 @@ async function clearIndex(cwd) {
  * @returns {Promise<string|null>}
  */
 export async function getStagedDiff(cwd) {
-  const g = git(cwd);
-  const diff = await g.diff(['--cached']);
-  return diff.trim() || null;
+	const g = git(cwd);
+	const diff = await g.diff(["--cached"]);
+	return diff.trim() || null;
 }
 
 /**
@@ -59,10 +59,10 @@ export async function getStagedDiff(cwd) {
  * @returns {Promise<string|null>}
  */
 export async function getStagedDiffForFiles(files, cwd) {
-  if (!files.length) return null;
-  const g = git(cwd);
-  const diff = await g.diff(['--cached', '--', ...files]);
-  return diff.trim() || null;
+	if (!files.length) return null;
+	const g = git(cwd);
+	const diff = await g.diff(["--cached", "--", ...files]);
+	return diff.trim() || null;
 }
 
 /**
@@ -73,38 +73,38 @@ export async function getStagedDiffForFiles(files, cwd) {
  * @returns {Promise<Array<{ path: string, additions: number|null, deletions: number|null, extension: string, status: string }>>}
  */
 export async function getStagedDiffIndex(cwd) {
-  const g = git(cwd);
-  const output = await g.diff(['--cached', '--numstat']);
-  const statusOutput = await g.diff(['--cached', '--name-status']);
-  const statusByPath = new Map(
-    statusOutput
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => {
-        const [statusRaw, ...pathParts] = line.split(/\t+/);
-        const path = pathParts.at(-1);
-        return [path, statusRaw?.[0] || 'M'];
-      })
-  );
+	const g = git(cwd);
+	const output = await g.diff(["--cached", "--numstat"]);
+	const statusOutput = await g.diff(["--cached", "--name-status"]);
+	const statusByPath = new Map(
+		statusOutput
+			.split(/\r?\n/)
+			.map((line) => line.trim())
+			.filter(Boolean)
+			.map((line) => {
+				const [statusRaw, ...pathParts] = line.split(/\t+/);
+				const path = pathParts.at(-1);
+				return [path, statusRaw?.[0] || "M"];
+			}),
+	);
 
-  return output
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [addsRaw, delsRaw, ...pathParts] = line.split(/\t+/);
-      const path = pathParts.join('\t');
-      const extensionMatch = path.match(/\.([^.\\/]+)$/);
+	return output
+		.split(/\r?\n/)
+		.map((line) => line.trim())
+		.filter(Boolean)
+		.map((line) => {
+			const [addsRaw, delsRaw, ...pathParts] = line.split(/\t+/);
+			const path = pathParts.join("\t");
+			const extensionMatch = path.match(/\.([^.\\/]+)$/);
 
-      return {
-        path,
-        additions: addsRaw === '-' ? null : Number(addsRaw),
-        deletions: delsRaw === '-' ? null : Number(delsRaw),
-        extension: extensionMatch?.[1] ?? '',
-        status: statusByPath.get(path) || 'M',
-      };
-    });
+			return {
+				path,
+				additions: addsRaw === "-" ? null : Number(addsRaw),
+				deletions: delsRaw === "-" ? null : Number(delsRaw),
+				extension: extensionMatch?.[1] ?? "",
+				status: statusByPath.get(path) || "M",
+			};
+		});
 }
 
 /**
@@ -114,9 +114,9 @@ export async function getStagedDiffIndex(cwd) {
  * @returns {Promise<string[]>}
  */
 export async function getStagedFiles(cwd) {
-  const g = git(cwd);
-  const status = await g.status();
-  return status.staged; // string[] of relative paths
+	const g = git(cwd);
+	const status = await g.status();
+	return status.staged; // string[] of relative paths
 }
 
 /**
@@ -127,18 +127,18 @@ export async function getStagedFiles(cwd) {
  * @returns {Promise<string[]>}
  */
 export async function getUnstagedFiles(cwd) {
-  const g = git(cwd);
-  const status = await g.status();
-  const staged = new Set(status.staged);
+	const g = git(cwd);
+	const status = await g.status();
+	const staged = new Set(status.staged);
 
-  return [
-    ...new Set(
-      status.files
-        .filter((file) => file.working_dir && file.working_dir !== ' ')
-        .filter((file) => !staged.has(file.path))
-        .map((file) => file.path)
-    ),
-  ];
+	return [
+		...new Set(
+			status.files
+				.filter((file) => file.working_dir && file.working_dir !== " ")
+				.filter((file) => !staged.has(file.path))
+				.map((file) => file.path),
+		),
+	];
 }
 
 // ─── Staging control ──────────────────────────────────────────────────────────
@@ -150,13 +150,13 @@ export async function getUnstagedFiles(cwd) {
  * @param {string} [cwd]
  */
 export async function unstageAll(cwd) {
-  const g = git(cwd);
-  if (!(await hasHead(cwd))) {
-    await clearIndex(cwd);
-    return;
-  }
+	const g = git(cwd);
+	if (!(await hasHead(cwd))) {
+		await clearIndex(cwd);
+		return;
+	}
 
-  await g.reset(['HEAD']); // mixed reset — index is cleared, working tree preserved
+	await g.reset(["HEAD"]); // mixed reset — index is cleared, working tree preserved
 }
 
 /**
@@ -166,14 +166,14 @@ export async function unstageAll(cwd) {
  * @param {string} [cwd]
  */
 export async function unstageFiles(files, cwd) {
-  if (!files.length) return;
-  const g = git(cwd);
-  if (!(await hasHead(cwd))) {
-    await unstageAddedFiles(files, cwd);
-    return;
-  }
+	if (!files.length) return;
+	const g = git(cwd);
+	if (!(await hasHead(cwd))) {
+		await unstageAddedFiles(files, cwd);
+		return;
+	}
 
-  await g.reset(['HEAD', '--', ...files]);
+	await g.reset(["HEAD", "--", ...files]);
 }
 
 /**
@@ -183,9 +183,9 @@ export async function unstageFiles(files, cwd) {
  * @param {string}   [cwd]
  */
 export async function stageFiles(files, cwd) {
-  if (!files.length) return;
-  const g = git(cwd);
-  await g.add(files);
+	if (!files.length) return;
+	const g = git(cwd);
+	await g.add(files);
 }
 
 // ─── Commit ───────────────────────────────────────────────────────────────────
@@ -199,9 +199,9 @@ export async function stageFiles(files, cwd) {
  * @returns {Promise<string>}  - The new commit SHA
  */
 export async function createCommit(message, cwd) {
-  const g = git(cwd);
-  const result = await g.commit(message);
-  return result.commit; // short SHA
+	const g = git(cwd);
+	const result = await g.commit(message);
+	return result.commit; // short SHA
 }
 
 // ─── Status helpers ───────────────────────────────────────────────────────────
@@ -216,9 +216,9 @@ export async function createCommit(message, cwd) {
  * @returns {Promise<string[]>}  - Subset of files that are actually staged
  */
 export async function filterStagedFiles(files, cwd) {
-  const staged = await getStagedFiles(cwd);
-  const stagedSet = new Set(staged);
-  return files.filter((f) => stagedSet.has(f));
+	const staged = await getStagedFiles(cwd);
+	const stagedSet = new Set(staged);
+	return files.filter((f) => stagedSet.has(f));
 }
 
 /**
@@ -226,7 +226,7 @@ export async function filterStagedFiles(files, cwd) {
  * @param {string} [cwd]
  */
 export async function getStatus(cwd) {
-  return git(cwd).status();
+	return git(cwd).status();
 }
 
 /**
@@ -234,10 +234,10 @@ export async function getStatus(cwd) {
  * @param {string} [cwd]
  */
 export async function isGitRepo(cwd) {
-  try {
-    await git(cwd).revparse(['--is-inside-work-tree']);
-    return true;
-  } catch {
-    return false;
-  }
+	try {
+		await git(cwd).revparse(["--is-inside-work-tree"]);
+		return true;
+	} catch {
+		return false;
+	}
 }
