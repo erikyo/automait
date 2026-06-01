@@ -1,8 +1,8 @@
 /**
  * config.js
  * Loads and merges configuration from multiple sources:
- *   1. .automaitrc.json (or any cosmiconfig-compatible format) in the project root
- *   2. Environment variables (AUTOMAIT_*)
+ *   1. .automitrc.json (or any cosmiconfig-compatible format) in the project root
+ *   2. Environment variables (AUTOMIT_*)
  *   3. CLI flags (highest priority, applied in cli.js)
  */
 
@@ -26,17 +26,17 @@ Write a short, concise commit message following these rules:
 // ─── Config file schema ───────────────────────────────────────────────────────
 
 /**
- * Loads the nearest .automaitrc.json / automait.config.js / "automait" key in package.json.
+ * Loads the nearest .automitrc.json / automit.config.js / "automit" key in package.json.
  * Returns an empty object if no config file is found.
  * @returns {Promise<Record<string, unknown>>}
  */
 async function loadFileConfig() {
-	const explorer = cosmiconfig("automait", {
+	const explorer = cosmiconfig("automit", {
 		searchPlaces: [
-			".automaitrc",
-			".automaitrc.json",
-			".automaitrc.js",
-			"automait.config.js",
+			".automitrc",
+			".automitrc.json",
+			".automitrc.js",
+			"automit.config.js",
 			"package.json",
 		],
 	});
@@ -54,13 +54,13 @@ async function loadFileConfig() {
 
 function loadEnvConfig() {
 	const env = {};
-	if (process.env.AUTOMAIT_ENDPOINT)
-		env.ollamaEndpoint = process.env.AUTOMAIT_ENDPOINT;
-	if (process.env.AUTOMAIT_MODEL) env.model = process.env.AUTOMAIT_MODEL;
-	if (process.env.AUTOMAIT_SYSTEM_PROMPT)
-		env.systemPrompt = process.env.AUTOMAIT_SYSTEM_PROMPT;
-	if (process.env.AUTOMAIT_TIMEOUT_MS)
-		env.timeoutMs = Number(process.env.AUTOMAIT_TIMEOUT_MS);
+	if (process.env.AUTOMIT_ENDPOINT)
+		env.ollamaEndpoint = process.env.AUTOMIT_ENDPOINT;
+	if (process.env.AUTOMIT_MODEL) env.model = process.env.AUTOMIT_MODEL;
+	if (process.env.AUTOMIT_SYSTEM_PROMPT)
+		env.systemPrompt = process.env.AUTOMIT_SYSTEM_PROMPT;
+	if (process.env.AUTOMIT_TIMEOUT_MS)
+		env.timeoutMs = Number(process.env.AUTOMIT_TIMEOUT_MS);
 	return env;
 }
 

@@ -72,7 +72,7 @@ export function printPlan(plan) {
 
 	console.log(
 		boxen(
-			c.primary.bold(" automait — AI Commit Plan ") +
+			c.primary.bold(" automit — AI Commit Plan ") +
 				"\n" +
 				c.muted(`  Powered by Ollama`),
 			{

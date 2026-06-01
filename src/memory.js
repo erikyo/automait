@@ -1,12 +1,12 @@
 /**
  * memory.js
- * Reads and writes the compact per-project automait memory.
+ * Reads and writes the compact per-project automit memory.
  */
 
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
-const MEMORY_PATH = join(".agents", ".automait");
+const MEMORY_PATH = join(".agents", ".automit");
 const MAX_MEMORY_CHARS = 1800;
 
 /**

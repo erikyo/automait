@@ -39,7 +39,7 @@ export async function appendGitignorePatterns(patterns, cwd = process.cwd()) {
 	if (!additions.length) return [];
 
 	const prefix = existing.trimEnd() ? `${existing.trimEnd()}\n\n` : "";
-	const next = `${prefix}# Added by automait\n${additions.join("\n")}\n`;
+	const next = `${prefix}# Added by automit\n${additions.join("\n")}\n`;
 	await writeFile(join(cwd, ".gitignore"), next, "utf8");
 
 	return additions;

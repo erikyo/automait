@@ -11,6 +11,6 @@ yarn-error.log*
 
 .vscode/*
 
-# Added by automait
+# Added by automit
 .DS_Store
 .idea/

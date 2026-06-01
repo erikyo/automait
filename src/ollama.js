@@ -1,7 +1,7 @@
 /**
  * ollama.js
  * Thin client around the Ollama REST API (/api/chat) plus the iterative
- * staged-diff planner used by automait.
+ * staged-diff planner used by automit.
  */
 
 /**
@@ -50,7 +50,7 @@ function getAutoDescription(file) {
 
 	return {
 		message: `chore: ${verb} ${metadata.label}`,
-		rationale: `${metadata.label} is generated dependency metadata, so automait uses a deterministic message instead of analyzing its diff.`,
+		rationale: `${metadata.label} is generated dependency metadata, so automit uses a deterministic message instead of analyzing its diff.`,
 	};
 }
 
@@ -911,7 +911,7 @@ Rules:
 }
 
 /**
- * Builds the next compact .agents/.automait memory.
+ * Builds the next compact .agents/.automit memory.
  *
  * @param {string} baseUrl
  * @param {string} model
@@ -947,7 +947,7 @@ ${JSON.stringify(plan, null, 2)}
 Main project folders:
 ${projectFolders.length ? projectFolders.join(", ") : "none detected"}
 
-Write the next .agents/.automait content.
+Write the next .agents/.automit content.
 
 Rules:
 - maximum 12 short lines
