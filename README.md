@@ -1,6 +1,6 @@
 # Automit 🤖
 
-> AI-powered Git commit workflow automation using a local [Ollama](https://ollama.com) model.
+> AI-powered Git commit planning workflow automation using a local [Ollama](https://ollama.com) model.
 
 `automit` analyzes your staged changes, proposes a semantically grouped commit plan that follows the [Conventional Commits](https://www.conventionalcommits.org/) specification, and walks you through applying each commit interactively — all without sending your code to the cloud.
 
@@ -16,6 +16,26 @@
 - **Safe restore** — skipped files are always re-staged exactly as they were.
 - **Post-commit follow-ups** — optionally update README, update CHANGELOG, or generate a PR message after commits.
 - **Beautiful output** — spinners, colours, and boxed summaries.
+
+---
+
+## Quick Start
+
+```bash
+# Stage some files
+git add src/auth.js src/middleware.js
+
+# Run automit
+npx automit
+```
+
+That's it. automit will:
+
+1. Detect the staged diff.
+2. Ask Ollama to analyse it and propose a commit plan.
+3. Print the plan in your terminal.
+4. Walk you through each proposed commit interactively.
+5. Offer optional README, CHANGELOG, and pull request message follow-ups.
 
 ---
 
@@ -64,26 +84,6 @@ cd automit
 npm install
 npm link          # makes `automit` available globally from this checkout
 ```
-
----
-
-## Quick Start
-
-```bash
-# Stage some files
-git add src/auth.js src/middleware.js
-
-# Run automit
-automit
-```
-
-That's it. automit will:
-
-1. Detect the staged diff.
-2. Ask Ollama to analyse it and propose a commit plan.
-3. Print the plan in your terminal.
-4. Walk you through each proposed commit interactively.
-5. Offer optional README, CHANGELOG, and pull request message follow-ups.
 
 ---
 

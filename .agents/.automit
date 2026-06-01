@@ -1,0 +1,12 @@
+# Project Structure Guide (Automit)
+# This file provides a structural map of the project components.
+## 📁 src/
+# Contains the primary application logic and executable source code.
+# - Core automation scripts and orchestration flow.
+## 📁 lib/
+# Holds reusable utility libraries, helpers, and foundational components.
+# - Functions designed for general use across multiple modules.
+## 📁 .agents/
+# Runtime state storage and persistent agent context data.
+# - Contains session history, user profiles, and current workflow snapshots.
+# ⚠️ DO NOT EDIT MANUALLY. This directory is managed by the core application.
